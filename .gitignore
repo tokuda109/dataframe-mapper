@@ -3,3 +3,5 @@
 *.pyo
 *.egg-info/
 .pytest_cache/
+dist/
+build/
