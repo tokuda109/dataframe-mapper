@@ -32,10 +32,8 @@ class DataFrameMetaClass(type):
         new_class._columns = OrderedDict()
 
         for column_name, column in attrs.items():
-            if not isinstance(column, DataFrameColumn):
-                continue
-
-            new_class._columns[column_name] = column
+            if isinstance(column, DataFrameColumn):
+                new_class._columns[column_name] = column
 
         return new_class
 
