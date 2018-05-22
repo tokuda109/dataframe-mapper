@@ -10,7 +10,7 @@ with open("dfmapper/__init__.py", "rb") as f:
         f.read().decode('utf-8')
     ).group(1)))
 
-with open("README.md") as f:
+with open("README.rst") as f:
     long_description = f.read()
 
 setup(
@@ -25,9 +25,12 @@ setup(
     license="MIT",
     packages=find_packages(),
     install_requires=[
-        "pandas>=0.20.0"
+        "pandas>=0.23.0"
     ],
     extras_require={
+        'lint': [
+            'pylint==1.9.1'
+        ],
         'test': [
             'pytest==3.5.1'
         ]
