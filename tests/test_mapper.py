@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# pylint: disable
 """
     tests.test_mapper
     ~~~~~~~~~~~~~~~~~
@@ -12,7 +13,7 @@ from collections import OrderedDict
 
 from pandas import DataFrame
 
-from dfmapper import DataFrameMapper, DataFrameColumn
+from dfmapper import DataFrameMapper, IntColumn, StrColumn
 
 def test_init_1():
     class Test1Dfm(DataFrameMapper): pass
@@ -30,14 +31,14 @@ def test_init_1():
 
 def test_init_2():
     class Test2Dfm(DataFrameMapper):
-        id = DataFrameColumn(int)
+        id = IntColumn(int)
 
     test_2_dfm = Test2Dfm()
 
     assert test_2_dfm._columns is not None
     assert len(test_2_dfm._columns) is 1
     assert hasattr(test_2_dfm, 'id')
-    assert isinstance(test_2_dfm.id, DataFrameColumn)
+    assert isinstance(test_2_dfm.id, IntColumn)
 
     assert isinstance(test_2_dfm._columns, OrderedDict)
     assert isinstance(test_2_dfm._src_df, DataFrame)
@@ -47,8 +48,8 @@ def test_init_2():
 
 def test_init_3():
     class Test3Dfm(DataFrameMapper):
-        id = DataFrameColumn(int)
-        title = DataFrameColumn(str)
+        id = IntColumn(int)
+        title = StrColumn(str)
 
     test_3_dfm = Test3Dfm({
         'id': [1, 2, 3],
@@ -58,9 +59,9 @@ def test_init_3():
     assert test_3_dfm._columns is not None
     assert len(test_3_dfm._columns) is 2
     assert hasattr(test_3_dfm, 'id')
-    assert isinstance(test_3_dfm.id, DataFrameColumn)
+    assert isinstance(test_3_dfm.id, IntColumn)
     assert hasattr(test_3_dfm, 'title')
-    assert isinstance(test_3_dfm.title, DataFrameColumn)
+    assert isinstance(test_3_dfm.title, StrColumn)
 
     assert isinstance(test_3_dfm._columns, OrderedDict)
     assert isinstance(test_3_dfm._src_df, DataFrame)
@@ -69,3 +70,13 @@ def test_init_3():
     assert isinstance(test_3_dfm._working_df, DataFrame)
     assert test_3_dfm._working_df.empty is False
     assert len(test_3_dfm._working_df) is 3
+
+def test_init_4():
+    class Test4Dfm(DataFrameMapper):
+        id = IntColumn(int)
+        title = StrColumn(str, nullable=False)
+
+    test_4_dfm = Test4Dfm({
+        'id': [1],
+        'title': [None]
+    })

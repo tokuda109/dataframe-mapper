@@ -1,24 +1,142 @@
 # -*- coding: utf-8 -*-
 """
-    dataframe-mapper.column
-    ~~~~~~~~~~~~~~~~~~~~~~~
+    dfmapper.column
+    ~~~~~~~~~~~~~~~
+
+    A column in a DataFrame Mapper.
 
     :copyright: (c) 2018 by Tsuyoshi Tokuda.
     :license: MIT, see LICENSE for more details.
 """
 
+from typing import Any, Optional
+
+import numpy as np
+
+from dfmapper.exceptions import ValidatorDoesNotCallable
+from dfmapper.validator import (
+    DtypeValidator,
+    MinValueValidator,
+    MaxValueValidator,
+    MaxLengthValidator,
+    NullableValidator
+)
+
 __all__ = (
-    "DataFrameColumn"
+    "BaseColumn",
+    "FloatColumn",
+    "IntColumn",
+    "StrColumn",
+    "create_column"
 )
 
 
-class DataFrameColumn(object):
+class BaseColumn(object):
+    """
+    .. versionchanged:: 0.0.2
+    """
 
-    def __init__(self, *args, **kwargs):
-        self.type = type(list(args).pop(0))
-        # self.nullable = kwargs.pop('nullable', True)
+    def __init__(self, dtype: np.dtype, *args, **kwargs):
+        """
+        :param dtype: The numpy dtype to check the column.
+        :type: numpy.dtype
+        """
+        self.validators = []
+
+        self.dtype = dtype
+
+        self.nullable = kwargs.get("nullable", True)
+
+        self.validators.append(NullableValidator(self.nullable))
 
     def __repr__(self):
-        return "<DataFrameColumn> type: {}".format(
-            self.type
-        )
+        return "<BaseColumn> type: {}".format(self.dtype)
+
+    def validate(self, values: Any) -> bool:
+        """
+        :param values:
+        :type: Any
+        :return:
+        :rtype: bool
+        """
+        errors = []
+
+        for validator in self.validators:
+            if not callable(validator):
+                raise ValidatorDoesNotCallable()
+    
+            result = validator(values)
+
+            if not result:
+                errors.append(validator.get_error())
+
+        self.errors = errors
+
+        return len(errors) == 0
+
+
+class FloatColumn(BaseColumn):
+    """
+    .. versionchanged:: 0.0.2
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(float, *args, **kwargs)
+
+        self.validators.append(DtypeValidator(np.float64))
+
+
+class IntColumn(BaseColumn):
+    """
+    .. versionchanged:: 0.0.2
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(np.int64, *args, **kwargs)
+
+        self.min = kwargs.get("min", None)
+        self.max = kwargs.get("max", None)
+
+        if self.nullable:
+            self.validators.append(DtypeValidator(np.float64))
+        else:
+            self.validators.append(DtypeValidator(np.int64))
+
+        if self.min is not None:
+            self.validators.append(MinValueValidator(self.min))
+
+        if self.max is not None:
+            self.validators.append(MaxValueValidator(self.max))
+
+
+class StrColumn(BaseColumn):
+    """
+    .. versionchanged:: 0.0.2
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(str, *args, **kwargs)
+
+        self.max_length = kwargs.get("max_length", None)
+
+        self.validators.append(DtypeValidator(object))
+
+        if self.max_length is not None:
+            self.validators.append(MaxLengthValidator(self.max_length))
+
+
+def create_column(dtype: Any, *args, **kwargs) -> Optional[BaseColumn]:
+    """
+    :param dtype:
+    :type: typing.Any
+    :return:
+    :rtype: typing.Optional[dfmapper.BaseColumn]
+    """
+    if dtype == object or dtype == str:
+        return StrColumn(args, kwargs)
+    elif dtype == np.float64 or dtype == float:
+        return FloatColumn(args, kwargs)
+    elif dtype == np.int64 or dtype == int:
+        return IntColumn(args, kwargs)
+    else:
+        return None
