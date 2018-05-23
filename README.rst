@@ -21,13 +21,13 @@ Example
 
 Simple DataFrame Mapper example::
 
-    from dfmapper import DataFrameMapper, DataFrameColumn
+    from dfmapper import DataFrameMapper, IntColumn, StrColumn
 
     class UserDfm(DataFrameMapper):
 
-        id = DataFrameColumn(int, nullable=False)
-        username = DataFrameColumn(str, nullable=False)
-        profile = DataFrameColumn(str)
+        id = IntColumn(int, nullable=False)
+        username = StrColumn(str, nullable=False)
+        profile = StrColumn(str)
 
         def find_by_id(self, id):
             return self.df[self.df.id == id]
@@ -35,10 +35,10 @@ Simple DataFrame Mapper example::
     user_dfm = UserDfm({
         "id": [1, 2, 3],
         "username": ["Bessie Bennett", "Sandra Matthews", "Jessie Bates"],
-        "profile": ["", "", ""]
+        "profile": ["BLAH BLAH BLAH", "PITH PITH PITH", None]
     })
 
-    user_dfm.is_valid
+    user_dfm.validate()
     #: True
 
     user_dfm.find_by_id(1)
