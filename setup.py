@@ -1,12 +1,13 @@
+# -*- coding: utf-8 -*-
 
 import re
 import ast
 from setuptools import find_packages, setup
 
-version_re = re.compile(r'__version__\s+=\s+(.*)')
+VERSION_RE = re.compile(r'__version__\s+=\s+(.*)')
 
 with open("dfmapper/__init__.py", "rb") as f:
-    version = str(ast.literal_eval(version_re.search(
+    version = str(ast.literal_eval(VERSION_RE.search(
         f.read().decode('utf-8')
     ).group(1)))
 
@@ -37,6 +38,8 @@ setup(
     },
     classifiers=[
         "Development Status :: 4 - Beta",
+        "Environment :: Web Environment",
+        "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
         "Programming Language :: Python",

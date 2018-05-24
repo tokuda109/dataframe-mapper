@@ -25,9 +25,9 @@ Simple DataFrame Mapper example::
 
     class UserDfm(DataFrameMapper):
 
-        id = IntColumn(int, nullable=False)
-        username = StrColumn(str, nullable=False)
-        profile = StrColumn(str)
+        id = IntColumn(min=1, nullable=False)
+        username = StrColumn(max_length=30, nullable=False)
+        profile = StrColumn()
 
         def find_by_id(self, id):
             return self.df[self.df.id == id]
@@ -43,7 +43,7 @@ Simple DataFrame Mapper example::
 
     user_dfm.find_by_id(1)
     #:    id username       profile
-    #: 0  1  Bessie Bennett
+    #: 0  1  Bessie Bennett BLAH BLAH BLAH
 
 License
 -------
