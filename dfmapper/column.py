@@ -13,8 +13,12 @@ from typing import Any, Optional
 
 import numpy as np
 
-from dfmapper.exceptions import ValidatorDoesNotCallable
+from dfmapper.exceptions import (
+    DataFrameMapperException,
+    ValidatorDoesNotCallable
+)
 from dfmapper.validator import (
+    Validator,
     DtypeValidator,
     MinValueValidator,
     MaxValueValidator,
@@ -36,11 +40,16 @@ class BaseColumn(object):
     .. versionchanged:: 0.0.2
     """
 
+    errors: [DataFrameMapperException] = None
+
+    validators: [Validator] = None
+
     def __init__(self, dtype: np.dtype, *args, **kwargs):
         """
         :param dtype: The numpy dtype to check the column.
         :type: numpy.dtype
         """
+        self.errors = []
         self.validators = []
 
         self.dtype = dtype
@@ -59,7 +68,7 @@ class BaseColumn(object):
         :return:
         :rtype: bool
         """
-        errors = []
+        self.errors = []
 
         for validator in self.validators:
             if not callable(validator):
@@ -68,11 +77,9 @@ class BaseColumn(object):
             result = validator(values)
 
             if not result:
-                errors.append(validator.get_error())
+                self.errors.append(validator.get_error())
 
-        self.errors = errors
-
-        return len(errors) == 0
+        return len(self.errors) == 0
 
 
 class FloatColumn(BaseColumn):

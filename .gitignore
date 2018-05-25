@@ -3,5 +3,6 @@
 *.pyo
 *.egg-info/
 .pytest_cache/
+.vscode/
 dist/
 build/

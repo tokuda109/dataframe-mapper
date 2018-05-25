@@ -12,7 +12,7 @@ from typing import Optional, Union
 
 from pandas import DataFrame
 
-from .column import create_column, BaseColumn
+from dfmapper.column import create_column, BaseColumn
 
 __all__ = (
     "DataFrameMapper"
@@ -55,15 +55,21 @@ class DataFrameMapper(dict, metaclass=DataFrameMetaClass):
     _src_df: Optional[DataFrame] = None
 
     #: working DataFrame
+    #:
+    #: .. versionadded:: 0.0.1
     _working_df: Optional[DataFrame] = None
 
-    #: DataFrameColumn list
+    #: List of columns.
+    #:
+    #: .. versionadded:: 0.0.1
     _columns = None
 
     def __init__(self, df_or_definition: Union[DataFrame, dict] = None) -> None:
         """
         :param df_or_definition:
         :type: Union[pandas.DataFrame, dict, None]
+
+        .. versionadded:: 0.0.1
         """
         if isinstance(df_or_definition, DataFrame):
             self._src_df = df_or_definition
@@ -90,13 +96,19 @@ class DataFrameMapper(dict, metaclass=DataFrameMetaClass):
         """
         :return:
         :rtype: pandas.DataFrame
+
+        .. versionadded:: 0.0.1
         """
         return self._working_df
 
-    def validate() -> bool:
+    def validate(self) -> bool:
         """
+        Run the validator.
+
         :return:
         :rtype: bool
+
+        .. versionadded:: 0.0.1
         """
         result = False
 
