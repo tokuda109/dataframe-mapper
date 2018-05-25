@@ -64,6 +64,8 @@ class DataFrameMapper(dict, metaclass=DataFrameMetaClass):
     #: .. versionadded:: 0.0.1
     _columns = None
 
+    _errors = []
+
     def __init__(self, df_or_definition: Union[DataFrame, dict] = None) -> None:
         """
         :param df_or_definition:
@@ -110,9 +112,15 @@ class DataFrameMapper(dict, metaclass=DataFrameMetaClass):
 
         .. versionadded:: 0.0.1
         """
-        result = False
+        self._errors = []
+
+        valid_amount = 0
 
         for key in self._columns:
-            self._columns[key].validate(self.df[key])
+            validator = self._columns[key]
+            if validator.validate(self.df[key]):
+                valid_amount += 1
+            else:
+                self._errors.append(validator.get_error())
 
-        return result
+        return valid_amount == len(self._columns)
