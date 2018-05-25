@@ -12,11 +12,26 @@ import numpy as np
 from pandas import DataFrame
 
 from dfmapper import (
+    BoolColumn,
     FloatColumn,
     IntColumn,
     StrColumn,
     create_column
 )
+
+def test_bool_column():
+    df_1 = DataFrame(data={'boolean': [True, False]})
+
+    bool_col_1 = BoolColumn()
+
+    assert bool_col_1.validate(df_1.boolean) is True
+
+
+    df_2 = DataFrame(data={'boolean': [True, False, None]})
+
+    bool_col_2 = BoolColumn()
+
+    assert bool_col_2.validate(df_2.boolean) is False
 
 def test_float_column():
     df_1 = DataFrame(data={'avg': [0.247, 0.304]})

@@ -28,6 +28,7 @@ from dfmapper.validator import (
 
 __all__ = (
     "BaseColumn",
+    "BoolColumn",
     "FloatColumn",
     "IntColumn",
     "StrColumn",
@@ -80,6 +81,14 @@ class BaseColumn(object):
                 self.errors.append(validator.get_error())
 
         return len(self.errors) == 0
+
+
+class BoolColumn(BaseColumn):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(bool, *args, **kwargs)
+
+        self.validators.append(DtypeValidator(bool))
 
 
 class FloatColumn(BaseColumn):

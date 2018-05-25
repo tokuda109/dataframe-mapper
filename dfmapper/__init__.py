@@ -9,6 +9,7 @@
 
 from dfmapper.mapper import DataFrameMapper
 from dfmapper.column import (
+    BoolColumn,
     FloatColumn,
     IntColumn,
     StrColumn,
@@ -28,6 +29,7 @@ __license__ = "MIT"
 __author__ = "Tsuyoshi Tokuda"
 
 __all__ = (
+    "BoolColumn",
     "FloatColumn",
     "IntColumn",
     "StrColumn",
