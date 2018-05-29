@@ -38,7 +38,7 @@ Simple DataFrame Mapper example::
         "profile": ["BLAH BLAH BLAH", "PITH PITH PITH", None]
     })
 
-    user_dfm.validate()
+    user_dfm.is_valid()
     #: True
 
     user_dfm.find_by_id(1)

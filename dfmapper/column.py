@@ -9,7 +9,7 @@
     :license: MIT, see LICENSE for more details.
 """
 
-from typing import Any, Optional
+from typing import Any, List, Optional
 
 import numpy as np
 
@@ -41,12 +41,16 @@ class BaseColumn(object):
     .. versionchanged:: 0.0.2
     """
 
-    errors: [DataFrameMapperException] = None
+    #: A list of error messages.
+    errors: List[DataFrameMapperException] = None
 
-    validators: [Validator] = None
+    #: A list of validators.
+    validators: List[Validator] = None
 
     def __init__(self, dtype: np.dtype, *args, **kwargs):
         """
+        Creates a new Column object.
+
         :param dtype: The numpy dtype to check the column.
         :type: numpy.dtype
         """
@@ -57,10 +61,15 @@ class BaseColumn(object):
 
         self.nullable = kwargs.get("nullable", True)
 
+        self.null_types = kwargs.get("null_types", [])
+
         self.validators.append(NullableValidator(self.nullable))
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<BaseColumn> type: {}".format(self.dtype)
+
+    def has_error(self) -> bool:
+        return len(self.errors) > 0
 
     def validate(self, values: Any) -> bool:
         """
@@ -90,6 +99,9 @@ class BoolColumn(BaseColumn):
 
         self.validators.append(DtypeValidator(bool))
 
+    def __repr__(self) -> str:
+        return "<BoolColumn>"
+
 
 class FloatColumn(BaseColumn):
     """
@@ -100,6 +112,9 @@ class FloatColumn(BaseColumn):
         super().__init__(float, *args, **kwargs)
 
         self.validators.append(DtypeValidator(np.float64))
+
+    def __repr__(self) -> str:
+        return "<FloatColumn>"
 
 
 class IntColumn(BaseColumn):
@@ -124,6 +139,9 @@ class IntColumn(BaseColumn):
         if self.max is not None:
             self.validators.append(MaxValueValidator(self.max))
 
+    def __repr__(self) -> str:
+        return "<IntColumn>"
+
 
 class StrColumn(BaseColumn):
     """
@@ -139,6 +157,9 @@ class StrColumn(BaseColumn):
 
         if self.max_length is not None:
             self.validators.append(MaxLengthValidator(self.max_length))
+
+    def __repr__(self) -> str:
+        return "<StrColumn>"
 
 
 def create_column(dtype: Any, *args, **kwargs) -> Optional[BaseColumn]:

@@ -8,11 +8,12 @@
 """
 
 from collections import OrderedDict
-from typing import Optional, Union
+from typing import List, Optional, Union
 
 from pandas import DataFrame
 
 from dfmapper.column import create_column, BaseColumn
+from dfmapper.exceptions import ValidationError, ValidatorDoesNotCallable
 
 __all__ = (
     "DataFrameMapper"
@@ -44,17 +45,15 @@ class DataFrameMetaClass(type):
 
 class DataFrameMapper(dict, metaclass=DataFrameMetaClass):
     """
-    This class implements a wrapper to 
-
     .. versionchanged:: 0.0.1
     """
 
-    #: source DataFrame
+    #: source DataFrame.
     #:
     #: .. versionadded:: 0.0.1
     _src_df: Optional[DataFrame] = None
 
-    #: working DataFrame
+    #: working DataFrame.
     #:
     #: .. versionadded:: 0.0.1
     _working_df: Optional[DataFrame] = None
@@ -62,12 +61,17 @@ class DataFrameMapper(dict, metaclass=DataFrameMetaClass):
     #: List of columns.
     #:
     #: .. versionadded:: 0.0.1
-    _columns = None
+    _columns: Optional[List[BaseColumn]] = None
 
-    _errors = []
+    #: List of errors.
+    #:
+    #: .. versionadded:: 0.0.2
+    _errors: List[ValidationError] = []
 
     def __init__(self, df_or_definition: Union[DataFrame, dict] = None) -> None:
         """
+        Constructor for :class:`DataFrameMapper`.
+
         :param df_or_definition:
         :type: Union[pandas.DataFrame, dict, None]
 
@@ -96,19 +100,24 @@ class DataFrameMapper(dict, metaclass=DataFrameMetaClass):
     @property
     def df(self) -> DataFrame:
         """
-        :return:
+        Return working :class:`pandas.DataFrame`.
+
+        :return: return `DataFrameMapper._working_df`.
         :rtype: pandas.DataFrame
 
         .. versionadded:: 0.0.1
         """
         return self._working_df
 
-    def validate(self) -> bool:
+    def is_valid(self) -> bool:
         """
-        Run the validator.
+        Return True if the :class:`DataFrameMapper` has no errors,
+        or False otherwise. And raise a :exc:`ValidatorDoesNotCallable` if
+        validator does not callable.
 
-        :return:
+        :return: validation result.
         :rtype: bool
+        :raise ValidatorDoesNotCallable: if validator does not callable.
 
         .. versionadded:: 0.0.1
         """
@@ -118,9 +127,12 @@ class DataFrameMapper(dict, metaclass=DataFrameMetaClass):
 
         for key in self._columns:
             validator = self._columns[key]
-            if validator.validate(self.df[key]):
-                valid_amount += 1
-            else:
-                self._errors.append(validator.get_error())
+            try:
+                if validator.validate(self.df[key]):
+                    valid_amount += 1
+                else:
+                    self._errors.append(validator.get_error())
+            except ValidatorDoesNotCallable as e:
+                raise ValidatorDoesNotCallable()
 
         return valid_amount == len(self._columns)
