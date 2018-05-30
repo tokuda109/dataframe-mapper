@@ -10,12 +10,14 @@
 from abc import abstractmethod
 from typing import Any
 
-from pandas import Series
+from numpy import issubdtype
+from pandas import DatetimeIndex, Series, date_range, to_datetime
 
 from dfmapper.exceptions import ValidationError
 
 __all__ = (
     "Validator",
+    "DateRangeValidator",
     "DtypeValidator",
     "MinValueValidator",
     "MaxValueValidator",
@@ -53,6 +55,40 @@ class Validator:
         raise NotImplementedError()
 
 
+class DateRangeValidator(Validator):
+    """
+    .. versionchanged:: 0.0.3
+    """
+
+    def __init__(self, date_range: DatetimeIndex, message=None):
+        super().__init__(message)
+
+        assert isinstance(date_range, DatetimeIndex)
+
+        self.date_range = date_range
+
+    def __call__(self, value: Series) -> bool:
+        self.value = value
+
+        from_date = to_datetime(min(self.date_range.tolist()).date())
+        to_date = to_datetime(max(self.date_range.tolist()).date())
+
+        in_range_amount = len(value.loc[
+            (value > from_date) & (value <= to_date)
+        ])
+
+        return len(value) == in_range_amount
+
+    def get_error(self) -> ValidationError:
+        """
+        :return:
+        :rtype: dfmapper.ValidationError
+
+        .. versionchanged:: 0.0.2
+        """
+        return ValidationError(self.message)
+
+
 class DtypeValidator(Validator):
     """
     .. versionchanged:: 0.0.2
@@ -66,7 +102,7 @@ class DtypeValidator(Validator):
     def __call__(self, value: Series) -> bool:
         self.value = value
 
-        return self.dtype == value.dtype
+        return issubdtype(self.dtype, value.dtype)
 
     def get_error(self) -> ValidationError:
         """

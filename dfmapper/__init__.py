@@ -10,6 +10,7 @@
 from dfmapper.mapper import DataFrameMapper
 from dfmapper.column import (
     BoolColumn,
+    DateTimeColumn,
     FloatColumn,
     IntColumn,
     StrColumn,
@@ -17,6 +18,7 @@ from dfmapper.column import (
 )
 from dfmapper.validator import (
     Validator,
+    DateRangeValidator,
     DtypeValidator,
     MinValueValidator,
     MaxValueValidator,
@@ -30,11 +32,13 @@ __author__ = "Tsuyoshi Tokuda"
 
 __all__ = (
     "BoolColumn",
+    "DateTimeColumn",
     "FloatColumn",
     "IntColumn",
     "StrColumn",
     "DataFrameMapper",
     "Validator",
+    "DateRangeValidator",
     "DtypeValidator",
     "MinValueValidator",
     "MaxValueValidator",

@@ -16,4 +16,4 @@ class IrisDfm(DataFrameMapper):
 
 iris_dfm = IrisDfm(iris_df)
 
-print(iris_dfm.validate())
+print(iris_dfm.is_valid())
