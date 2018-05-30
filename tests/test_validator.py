@@ -9,15 +9,32 @@
 """
 
 import numpy as np
-from pandas import Series
+from pandas import Series, date_range, to_datetime
 
 from dfmapper import (
+    DateRangeValidator,
     DtypeValidator,
     MinValueValidator,
     MaxValueValidator,
     MaxLengthValidator,
     NullableValidator
 )
+
+def test_date_range_validator():
+    series_1 = Series(['2018-01-15 12:00:00', '2018-01-15 13:00:00'])
+    series_1 = to_datetime(series_1)
+
+    date_range_validator_1 = DateRangeValidator(date_range(start='2018-01-01', end='2018-01-30'))
+
+    assert date_range_validator_1(series_1) == True
+
+
+    series_2 = Series(['2018-01-15 12:00:00', '2018-01-15 13:00:00'])
+    series_2 = to_datetime(series_2)
+
+    date_range_validator_2 = DateRangeValidator(date_range(start='2018-01-20', end='2018-01-30'))
+
+    assert date_range_validator_2(series_2) == False
 
 def test_type_validator():
     series_1 = Series([1, 2, 3, 4, 5], dtype='int')

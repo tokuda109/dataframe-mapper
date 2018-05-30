@@ -18,6 +18,7 @@ from dfmapper.column import (
 )
 from dfmapper.validator import (
     Validator,
+    DateRangeValidator,
     DtypeValidator,
     MinValueValidator,
     MaxValueValidator,
@@ -37,6 +38,7 @@ __all__ = (
     "StrColumn",
     "DataFrameMapper",
     "Validator",
+    "DateRangeValidator",
     "DtypeValidator",
     "MinValueValidator",
     "MaxValueValidator",
