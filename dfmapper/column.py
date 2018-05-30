@@ -12,6 +12,7 @@
 from typing import Any, List, Optional
 
 import numpy as np
+import pandas as pd
 
 from dfmapper.exceptions import (
     DataFrameMapperException,
@@ -19,6 +20,7 @@ from dfmapper.exceptions import (
 )
 from dfmapper.validator import (
     Validator,
+    DateRangeValidator,
     DtypeValidator,
     MinValueValidator,
     MaxValueValidator,
@@ -94,6 +96,9 @@ class BaseColumn(object):
 
 
 class BoolColumn(BaseColumn):
+    """
+    .. versionchanged:: 0.0.2
+    """
 
     def __init__(self, *args, **kwargs):
         super().__init__(bool, *args, **kwargs)
@@ -105,11 +110,21 @@ class BoolColumn(BaseColumn):
 
 
 class DateTimeColumn(BaseColumn):
+    """
+    .. versionchanged:: 0.0.3
+    """
 
     def __init__(self, *args, **kwargs):
         super().__init__(bool, *args, **kwargs)
 
         self.validators.append(DtypeValidator(np.datetime64))
+
+        self.start = kwargs.get("start", None)
+        self.end = kwargs.get("end", None)
+
+        if self.start and self.end:
+            date_range = pd.date_range(start=self.start, end=self.end)
+            self.validators.append(DateRangeValidator(date_range))
 
     def __repr__(self) -> str:
         return "<DateTimeColumn>"
@@ -152,7 +167,7 @@ class IntColumn(BaseColumn):
             self.validators.append(MaxValueValidator(self.max))
 
     def __repr__(self) -> str:
-        return "<IntColumn>"
+        return "<IntColumn> min: {}, max: {}".format(self.min, self.max)
 
 
 class StrColumn(BaseColumn):
@@ -180,6 +195,8 @@ def create_column(dtype: Any, *args, **kwargs) -> Optional[BaseColumn]:
     :type: typing.Any
     :return:
     :rtype: typing.Optional[dfmapper.BaseColumn]
+
+    .. versionchanged:: 0.0.2
     """
     if dtype == object or dtype == str:
         return StrColumn(args, kwargs)
