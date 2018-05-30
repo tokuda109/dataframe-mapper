@@ -9,10 +9,11 @@
 """
 
 import numpy as np
-from pandas import DataFrame
+from pandas import DataFrame, to_datetime
 
 from dfmapper import (
     BoolColumn,
+    DateTimeColumn,
     FloatColumn,
     IntColumn,
     StrColumn,
@@ -32,6 +33,15 @@ def test_bool_column():
     bool_col_2 = BoolColumn()
 
     assert bool_col_2.validate(df_2.boolean) is False
+
+def test_date_time_column():
+    df_1 = DataFrame([['2018-05-30 12:00:00'], ['2018-05-30 13:00:00']], columns=['datetime'])
+
+    df_1['datetime'] = to_datetime(df_1.datetime)
+
+    date_time_col_1 = DateTimeColumn()
+
+    assert date_time_col_1.validate(df_1.datetime) is True
 
 def test_float_column():
     df_1 = DataFrame(data={'avg': [0.247, 0.304]})

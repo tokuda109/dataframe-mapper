@@ -29,6 +29,7 @@ from dfmapper.validator import (
 __all__ = (
     "BaseColumn",
     "BoolColumn",
+    "DateTimeColumn",
     "FloatColumn",
     "IntColumn",
     "StrColumn",
@@ -101,6 +102,17 @@ class BoolColumn(BaseColumn):
 
     def __repr__(self) -> str:
         return "<BoolColumn>"
+
+
+class DateTimeColumn(BaseColumn):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(bool, *args, **kwargs)
+
+        self.validators.append(DtypeValidator(np.datetime64))
+
+    def __repr__(self) -> str:
+        return "<DateTimeColumn>"
 
 
 class FloatColumn(BaseColumn):

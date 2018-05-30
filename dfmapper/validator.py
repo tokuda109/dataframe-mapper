@@ -10,6 +10,7 @@
 from abc import abstractmethod
 from typing import Any
 
+from numpy import issubdtype
 from pandas import Series
 
 from dfmapper.exceptions import ValidationError
@@ -66,7 +67,7 @@ class DtypeValidator(Validator):
     def __call__(self, value: Series) -> bool:
         self.value = value
 
-        return self.dtype == value.dtype
+        return issubdtype(self.dtype, value.dtype)
 
     def get_error(self) -> ValidationError:
         """

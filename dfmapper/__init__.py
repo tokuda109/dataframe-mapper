@@ -10,6 +10,7 @@
 from dfmapper.mapper import DataFrameMapper
 from dfmapper.column import (
     BoolColumn,
+    DateTimeColumn,
     FloatColumn,
     IntColumn,
     StrColumn,
@@ -30,6 +31,7 @@ __author__ = "Tsuyoshi Tokuda"
 
 __all__ = (
     "BoolColumn",
+    "DateTimeColumn",
     "FloatColumn",
     "IntColumn",
     "StrColumn",
